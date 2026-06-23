@@ -1,0 +1,13 @@
+Optional. If this folder (named docs-html, next to the build files)
+contains the rendered offline documentation, with index.html at its
+root, Install-Godot.ps1 will copy it into the install and add a local
+docs shortcut pointing straight at index.html.
+
+You can fill this folder by running:
+
+  .\Get-GodotDocs.ps1 -Destination "C:\path\to\this\docs-html"
+
+This downloads the official prebuilt offline HTML docs (rendered pages,
+not raw source) from the godot-docs project. Leave this folder empty if
+you do not want a local docs shortcut, the online docs shortcut gets
+created either way.

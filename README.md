@@ -36,8 +36,10 @@ Parameters:
 - `-DocsUrl` the online docs link used for the docs shortcut. Default is
   `https://docs.godotengine.org/en/stable/`.
 
-If a `godot-docs` folder is found inside `-SourcePath`, it gets copied
-alongside the install and a local docs shortcut is added too.
+If a `docs-html` folder is found inside `-SourcePath` (the rendered
+offline docs, see Get-GodotDocs.ps1 below), it gets copied alongside the
+install and a local docs shortcut is added, pointing straight at
+`index.html`.
 
 ### Get-LatestGodot.ps1
 
@@ -63,14 +65,37 @@ that version's install, even if it is already there.
 .\Get-LatestGodot-Force.ps1
 ```
 
+### Get-GodotDocs.ps1
+
+Downloads the official prebuilt offline HTML documentation (rendered
+pages, not the raw .rst source) from the godot-docs project, refreshed
+weekly, and attaches it to an already installed Godot version. Updates
+the `Godot Docs (Local)` Start Menu shortcut to open `index.html`
+directly.
+
+```
+.\Get-GodotDocs.ps1
+```
+
+Parameters:
+
+- `-DocsVersion` stable, latest, or 3.6. Default is stable.
+- `-GodotVersion` which installed version to attach the docs to, for
+  example 4.7. If only one version is installed, this is detected
+  automatically. Required if more than one is installed.
+- `-InstallRoot` same meaning as in the other scripts.
+- `-Destination` instead of attaching to an install, just download and
+  extract the docs to a folder of your choice, for example to fill in
+  `sample-source\docs-html` before running Install-Godot.ps1.
+
 ## What gets created
 
 For a given version, for example 4.7:
 
 - `C:\Program Files\Godot\4.7\Standard` and `\Mono`, the actual installed
   builds
-- `C:\Program Files\Godot\4.7\docs-source`, only if local docs were
-  supplied to Install-Godot.ps1
+- `C:\Program Files\Godot\4.7\docs-html`, the rendered offline docs, if
+  supplied to Install-Godot.ps1 or fetched with Get-GodotDocs.ps1
 - Desktop shortcuts on `C:\Users\Public\Desktop` named `Godot 4.7` and
   `Godot 4.7 (Mono)`
 - A Start Menu folder named `Godot 4.7` under Programs, with the same

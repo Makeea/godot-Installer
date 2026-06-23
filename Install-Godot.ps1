@@ -14,7 +14,8 @@ and Start Menu shortcuts for the app, the install folder, and the docs.
 How to run:
 1) Point -SourcePath at a folder containing a Godot version's build files
    (the extracted exe folder(s) and/or .zip(s), e.g. "Godot v4.7"),
-   optionally alongside a "godot-docs" folder.
+   optionally alongside a "docs-html" folder holding the rendered offline
+   documentation (see Get-GodotDocs.ps1).
 2) Run PowerShell as Administrator.
 3) Execute: .\Install-Godot.ps1 -SourcePath "C:\path\to\Godot v4.7"
 
@@ -147,16 +148,17 @@ foreach ($v in $builds.Keys) {
 	$installedExes[$v] = $exe.FullName
 }
 
-# Optional local docs source
-$docsSource = Join-Path $SourcePath 'godot-docs'
-$localDocsDir = $null
-if (Test-Path -LiteralPath $docsSource) {
-	$localDocsDir = Join-Path $versionRoot 'docs-source'
-	log "Copying local docs source to $localDocsDir"
+# Optional local rendered docs (see Get-GodotDocs.ps1)
+$docsSource = Join-Path $SourcePath 'docs-html'
+$localDocsIndex = $null
+if (Test-Path -LiteralPath (Join-Path $docsSource 'index.html')) {
+	$localDocsDir = Join-Path $versionRoot 'docs-html'
+	log "Copying local docs to $localDocsDir"
 	if (Test-Path -LiteralPath $localDocsDir) { Remove-Item -LiteralPath $localDocsDir -Recurse -Force }
 	Copy-Item -Path $docsSource -Destination $localDocsDir -Recurse -Force
+	$localDocsIndex = Join-Path $localDocsDir 'index.html'
 } else {
-	log "No godot-docs folder found in $SourcePath; skipping local docs shortcut."
+	log "No docs-html folder found in $SourcePath; skipping local docs shortcut."
 }
 
 # Shortcut labels per variant
@@ -188,10 +190,10 @@ $docsOnlineLnk = Join-Path $startMenuDir 'Godot Docs (Online).url'
 log "Creating Start Menu shortcut $docsOnlineLnk"
 New-UrlShortcut -Path $docsOnlineLnk -Url $DocsUrl
 
-if ($localDocsDir) {
-	$docsLocalLnk = Join-Path $startMenuDir 'Godot Docs (Local Source).lnk'
+if ($localDocsIndex) {
+	$docsLocalLnk = Join-Path $startMenuDir 'Godot Docs (Local).lnk'
 	log "Creating Start Menu shortcut $docsLocalLnk"
-	New-Shortcut -Path $docsLocalLnk -Target $localDocsDir
+	New-Shortcut -Path $docsLocalLnk -Target $localDocsIndex
 }
 
 log "Done. Installed Godot $version ($($installedExes.Keys -join ', ')) to $versionRoot"
