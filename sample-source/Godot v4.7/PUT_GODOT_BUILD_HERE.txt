@@ -1,0 +1,14 @@
+Put a Godot release here before running Install-Godot.ps1 with -SourcePath
+pointing at this folder (or its parent).
+
+Accepted forms, matching Godot's official naming:
+
+  Godot_v<version>-stable_win64.exe.zip       (Standard build, zipped)
+  Godot_v<version>-stable_mono_win64.zip      (Mono build, zipped)
+
+or the already extracted folder for either build, with the exe somewhere
+inside it.
+
+You only need the variant(s) you actually plan to install. Real zip and
+exe files are ignored by .gitignore so they never get committed, only
+this placeholder stays in the repo to show the expected layout.

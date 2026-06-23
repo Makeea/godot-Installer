@@ -1,1 +1,3 @@
 logs/
+sample-source/**/*.zip
+sample-source/**/*.exe

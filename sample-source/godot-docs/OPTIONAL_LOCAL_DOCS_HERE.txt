@@ -1,0 +1,7 @@
+Optional. If you put a local clone of the godot-docs source repo in a
+folder named godot-docs next to the build files, Install-Godot.ps1 will
+copy it into the install and add a local docs shortcut.
+
+This is the raw documentation source (reStructuredText), not rendered
+HTML. Leave this folder empty if you do not want a local docs shortcut,
+the online docs shortcut gets created either way.
