@@ -6,6 +6,13 @@ Program Files so old and new versions sit side by side, and the scripts
 create Desktop and Start Menu shortcuts so the app, the install folder,
 and the docs are easy to find.
 
+## For everyone else (no PowerShell needed)
+
+Double-click `Godot Install Menu.bat`. It asks for Administrator once,
+then shows a plain numbered menu for installing Godot, getting the
+latest version, and adding offline docs, no typing required. Everything
+below this section is for whoever maintains the scripts themselves.
+
 ## Requirements
 
 - Windows
