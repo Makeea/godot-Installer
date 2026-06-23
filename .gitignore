@@ -1,3 +1,5 @@
 logs/
 sample-source/**/*.zip
 sample-source/**/*.exe
+sample-source/godot-docs/*
+!sample-source/godot-docs/OPTIONAL_LOCAL_DOCS_HERE.txt
