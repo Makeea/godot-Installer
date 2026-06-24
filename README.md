@@ -139,19 +139,23 @@ placeholder text files and point `-SourcePath` at the `source` folder
 
 ## Building the downloadable installer
 
-`Build-SfxInstaller.ps1` is maintainer-only, not something end users
-run. It packages the menu, the four scripts, README.md, and LICENSE
-into a single self-extracting `Godot-Installer-Setup.exe` using
-`iexpress.exe` (built into Windows, no extra tools needed):
+Everything in `build\` is maintainer-only, not something end users run.
+`Build-SfxInstaller.ps1` packages the menu, the four scripts,
+README.md, and LICENSE into a single self-extracting
+`Godot-Installer-Setup.exe` using `iexpress.exe` (built into Windows, no
+extra tools needed). Double-click `build\Build-SfxInstaller.bat`, or
+from PowerShell:
 
 ```
-.\Build-SfxInstaller.ps1
+.\build\Build-SfxInstaller.ps1
 ```
 
-Produces `dist\Godot-Installer-Setup.exe`. Running that file copies its
-contents to `%USERPROFILE%\Downloads\Godot Installer` and opens
-`Godot Install Menu.bat` from there, via the bundled `_bootstrap.bat`.
-This is the file that gets attached to GitHub Releases.
+Produces `dist\Godot-Installer-Setup.exe` at the repo root. Running
+that file copies its contents to
+`%USERPROFILE%\Downloads\Godot Installer` and opens
+`Godot Install Menu.bat` from there, via the bundled
+`build\_bootstrap.bat`. This is the file that gets attached to GitHub
+Releases.
 
 ## Logs
 

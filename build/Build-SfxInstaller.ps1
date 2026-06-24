@@ -15,7 +15,7 @@ the resulting .exe copies its contents to
 Releases so non-technical users have one file to download and run.
 
 How to run:
-.\Build-SfxInstaller.ps1
+.\build\Build-SfxInstaller.ps1
 Produces .\dist\Godot-Installer-Setup.exe
 
 Email: 23248581+Makeea@users.noreply.github.com
@@ -23,10 +23,14 @@ GitHub: https://github.com/Makeea
 #>
 
 param(
-	[string]$OutputPath = (Join-Path $PSScriptRoot 'dist\Godot-Installer-Setup.exe')
+	[string]$OutputPath = (Join-Path (Split-Path -Parent $PSScriptRoot) 'dist\Godot-Installer-Setup.exe')
 )
 
-$filesToBundle = @(
+# Repo root, since this script lives in build\ but most of what it
+# bundles lives one level up alongside the end-user-facing files.
+$repo_root = Split-Path -Parent $PSScriptRoot
+
+$filesFromRepoRoot = @(
 	'Install-Godot.ps1'
 	'Get-LatestGodot.ps1'
 	'Get-LatestGodot-Force.ps1'
@@ -35,8 +39,9 @@ $filesToBundle = @(
 	'Godot Install Menu.ps1'
 	'README.md'
 	'LICENSE'
-	'_bootstrap.bat'
 )
+$filesFromBuildFolder = @('_bootstrap.bat')
+$filesToBundle = $filesFromRepoRoot + $filesFromBuildFolder
 
 $stage_dir	= Join-Path $env:TEMP 'Godot_Sfx_Stage'
 $sed_path	= Join-Path $stage_dir 'GodotInstaller.sed'
@@ -44,7 +49,15 @@ $sed_path	= Join-Path $stage_dir 'GodotInstaller.sed'
 if (Test-Path -LiteralPath $stage_dir) { Remove-Item -LiteralPath $stage_dir -Recurse -Force }
 New-Item -ItemType Directory -Path $stage_dir -Force | Out-Null
 
-foreach ($file in $filesToBundle) {
+foreach ($file in $filesFromRepoRoot) {
+	$source = Join-Path $repo_root $file
+	if (-not (Test-Path -LiteralPath $source)) {
+		Write-Error "Missing file, can't build: $source"
+		exit 1
+	}
+	Copy-Item -LiteralPath $source -Destination (Join-Path $stage_dir $file) -Force
+}
+foreach ($file in $filesFromBuildFolder) {
 	$source = Join-Path $PSScriptRoot $file
 	if (-not (Test-Path -LiteralPath $source)) {
 		Write-Error "Missing file, can't build: $source"
