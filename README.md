@@ -9,9 +9,22 @@ and the docs are easy to find.
 ## For everyone else (no PowerShell needed)
 
 Double-click `Godot Install Menu.bat`. It asks for Administrator once,
-then shows a plain numbered menu for installing Godot, getting the
-latest version, and adding offline docs, no typing required. Everything
-below this section is for whoever maintains the scripts themselves.
+then shows a plain numbered menu, no typing required beyond answering
+its yes/no and pick-a-number questions:
+
+1. Install everything (latest Godot, Mono, and offline docs) in one go
+2. Download and install the latest Godot from the internet
+3. Install Godot from a folder on this computer
+4. Download offline help docs for an installed Godot
+5. Open the logs folder
+6. Exit
+
+Options 2 and 3 ask whether you want Godot, Godot Mono (for C#
+projects), or both. Option 1 always installs both with no extra
+questions, since it is meant to be the simplest path for a new machine.
+
+Everything below this section is for whoever maintains the scripts
+themselves.
 
 ## Requirements
 
