@@ -53,11 +53,12 @@ function Show-Menu {
 	Write-Host "  Godot Install Menu  (running as Administrator)"
 	Write-Host "========================================"
 	Write-Host ""
-	Write-Host "  1) Install Godot from a folder on this computer"
+	Write-Host "  1) Install everything (latest Godot, Mono, and offline docs)"
 	Write-Host "  2) Download and install the latest Godot from the internet"
-	Write-Host "  3) Download offline help docs for an installed Godot"
-	Write-Host "  4) Open the logs folder"
-	Write-Host "  5) Exit"
+	Write-Host "  3) Install Godot from a folder on this computer"
+	Write-Host "  4) Download offline help docs for an installed Godot"
+	Write-Host "  5) Open the logs folder"
+	Write-Host "  6) Exit"
 	Write-Host ""
 }
 
@@ -77,6 +78,22 @@ function Read-YesNo {
 		if ($answer -match '^(y|yes)$') { return $true }
 		if ($answer -match '^(n|no)$') { return $false }
 		Write-Host "Please answer y or n." -ForegroundColor Yellow
+	}
+}
+
+function Select-Variant {
+	Write-Host ""
+	Write-Host "Which version of Godot do you want?"
+	Write-Host ""
+	Write-Host "  1) Godot"
+	Write-Host "  2) Godot Mono (for C# projects)"
+	Write-Host "  3) Both"
+	Write-Host ""
+	$choice = Read-MenuChoice -ValidChoices @('1', '2', '3')
+	switch ($choice) {
+		'1' { return 'Standard' }
+		'2' { return 'Mono' }
+		'3' { return 'Both' }
 	}
 }
 
@@ -128,32 +145,32 @@ function Invoke-InstallFromFolder {
 		Write-Host "Cancelled, nothing was installed."
 		return
 	}
-	Invoke-ChildScript -ScriptName 'Install-Godot.ps1' -Parameters @{ SourcePath = $chosenFolder }
+	$variant = Select-Variant
+	Invoke-ChildScript -ScriptName 'Install-Godot.ps1' -Parameters @{ SourcePath = $chosenFolder; Variant = $variant }
 }
 
 function Invoke-GetLatest {
+	$variant = Select-Variant
 	$force = Read-YesNo "Force a fresh re-download even if this version is already installed?"
 	if ($force) {
-		Invoke-ChildScript -ScriptName 'Get-LatestGodot-Force.ps1'
+		Invoke-ChildScript -ScriptName 'Get-LatestGodot-Force.ps1' -Parameters @{ Variant = $variant }
 	} else {
-		Invoke-ChildScript -ScriptName 'Get-LatestGodot.ps1'
+		Invoke-ChildScript -ScriptName 'Get-LatestGodot.ps1' -Parameters @{ Variant = $variant }
 	}
 }
 
-function Invoke-GetDocs {
+function Select-InstalledGodotVersion {
+	param([string]$NoneFoundMessage = "No installed Godot version was found.")
+
 	$installed = Get-ChildItem -LiteralPath $install_root -Directory -ErrorAction SilentlyContinue
 	if (-not $installed -or $installed.Count -eq 0) {
-		Write-Host "No installed Godot version was found. Install one first using option 1 or 2."
-		return
+		Write-Host $NoneFoundMessage
+		return $null
 	}
-
-	if ($installed.Count -eq 1) {
-		Invoke-ChildScript -ScriptName 'Get-GodotDocs.ps1' -Parameters @{ GodotVersion = $installed[0].Name }
-		return
-	}
+	if ($installed.Count -eq 1) { return $installed[0].Name }
 
 	Write-Host ""
-	Write-Host "More than one Godot version is installed. Which one should get the offline docs?"
+	Write-Host "More than one Godot version is installed. Which one do you want?"
 	Write-Host ""
 	for ($i = 0; $i -lt $installed.Count; $i++) {
 		Write-Host "  $($i + 1)) $($installed[$i].Name)"
@@ -166,10 +183,23 @@ function Invoke-GetDocs {
 	$choice = [int](Read-MenuChoice -ValidChoices $validChoices)
 	if ($choice -eq $cancelChoice) {
 		Write-Host "Cancelled."
-		return
+		return $null
 	}
-	$chosenVersion = $installed[$choice - 1].Name
-	Invoke-ChildScript -ScriptName 'Get-GodotDocs.ps1' -Parameters @{ GodotVersion = $chosenVersion }
+	return $installed[$choice - 1].Name
+}
+
+function Invoke-GetDocs {
+	$version = Select-InstalledGodotVersion -NoneFoundMessage "No installed Godot version was found. Install one first using option 1, 2, or 3."
+	if (-not $version) { return }
+	Invoke-ChildScript -ScriptName 'Get-GodotDocs.ps1' -Parameters @{ GodotVersion = $version }
+}
+
+function Invoke-InstallEverything {
+	Invoke-ChildScript -ScriptName 'Get-LatestGodot.ps1' -Parameters @{ Variant = 'Both' }
+	$version = Select-InstalledGodotVersion -NoneFoundMessage "Something went wrong, no installed Godot version was found after installing."
+	if ($version) {
+		Invoke-ChildScript -ScriptName 'Get-GodotDocs.ps1' -Parameters @{ GodotVersion = $version }
+	}
 }
 
 function Invoke-OpenLogsFolder {
@@ -183,15 +213,16 @@ function Invoke-OpenLogsFolder {
 do {
 	Clear-Host
 	Show-Menu
-	$choice = Read-MenuChoice -ValidChoices @('1', '2', '3', '4', '5')
+	$choice = Read-MenuChoice -ValidChoices @('1', '2', '3', '4', '5', '6')
 
 	switch ($choice) {
-		'1' { Invoke-InstallFromFolder }
+		'1' { Invoke-InstallEverything }
 		'2' { Invoke-GetLatest }
-		'3' { Invoke-GetDocs }
-		'4' { Invoke-OpenLogsFolder }
-		'5' { Write-Host "Goodbye!"; exit }
+		'3' { Invoke-InstallFromFolder }
+		'4' { Invoke-GetDocs }
+		'5' { Invoke-OpenLogsFolder }
+		'6' { Write-Host "Goodbye!"; exit }
 	}
 
-	if ($choice -ne '5') { Wait-ForEnter }
+	if ($choice -ne '6') { Wait-ForEnter }
 } while ($true)
