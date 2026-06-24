@@ -12,13 +12,24 @@ Install-Godot.ps1, Get-LatestGodot.ps1, Get-LatestGodot-Force.ps1, and
 Get-GodotDocs.ps1 so nobody has to know script names or parameters.
 
 How to run:
-Double-click "Godot Install Menu.bat" in this same folder. Do not
-double-click this .ps1 file directly, Windows will try to open it in a
-text editor instead of running it.
+Double-click "Godot Install Menu.bat" at the repo root, one folder up
+from this file. Do not double-click this .ps1 file directly, Windows
+will try to open it in a text editor instead of running it.
 
 Email: 23248581+Makeea@users.noreply.github.com
 GitHub: https://github.com/Makeea
 #>
+
+# In the git repo this script lives in scripts\, with source\, logs\,
+# and Godot Install Menu.bat one level up at the repo root. But the SFX
+# installer (build\Build-SfxInstaller.ps1) extracts everything flat
+# into one folder, no scripts\ subfolder, so detect which layout this
+# is actually running from rather than assuming the repo's.
+$repo_root = if (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'Godot Install Menu.bat')) {
+	$PSScriptRoot
+} else {
+	Split-Path -Parent $PSScriptRoot
+}
 
 function Test-IsElevated {
 	$wi = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -28,7 +39,7 @@ function Test-IsElevated {
 
 if (-not (Test-IsElevated)) {
 	try {
-		Start-Process -FilePath 'powershell.exe' -WorkingDirectory $PSScriptRoot -Verb RunAs -ErrorAction Stop -ArgumentList @(
+		Start-Process -FilePath 'powershell.exe' -WorkingDirectory $repo_root -Verb RunAs -ErrorAction Stop -ArgumentList @(
 			'-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`""
 		) | Out-Null
 	} catch {
@@ -126,7 +137,7 @@ function Invoke-ChildScript {
 	Write-Host ""
 	Write-Host "Running $ScriptName ..." -ForegroundColor Cyan
 	Write-Host ""
-	Push-Location $PSScriptRoot
+	Push-Location $repo_root
 	try {
 		& $scriptPath @Parameters
 	} catch {
@@ -138,8 +149,8 @@ function Invoke-ChildScript {
 }
 
 function Invoke-InstallFromFolder {
-	$sourceFolder = Join-Path $PSScriptRoot 'source'
-	$initialPath = if (Test-Path -LiteralPath $sourceFolder) { $sourceFolder } else { $PSScriptRoot }
+	$sourceFolder = Join-Path $repo_root 'source'
+	$initialPath = if (Test-Path -LiteralPath $sourceFolder) { $sourceFolder } else { $repo_root }
 	$chosenFolder = Select-FolderDialog -Description "Select the folder containing the Godot build you want to install (the extracted folder or .zip files)" -InitialPath $initialPath
 	if (-not $chosenFolder) {
 		Write-Host "Cancelled, nothing was installed."
@@ -203,7 +214,7 @@ function Invoke-InstallEverything {
 }
 
 function Invoke-OpenLogsFolder {
-	$logsPath = Join-Path $PSScriptRoot 'logs'
+	$logsPath = Join-Path $repo_root 'logs'
 	if (-not (Test-Path -LiteralPath $logsPath)) {
 		New-Item -ItemType Directory -Path $logsPath -Force | Out-Null
 	}

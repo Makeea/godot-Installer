@@ -14,9 +14,9 @@ Download `Godot-Installer-Setup.exe` from the
 need to clone this repo or know what any of these files are.
 
 If you already have this repo instead, double-click
-`Godot Install Menu.bat` directly. It asks for Administrator once, then
-shows a plain numbered menu, no typing required beyond answering its
-yes/no and pick-a-number questions:
+`Godot Install Menu.bat` at the repo root. It asks for Administrator
+once, then shows a plain numbered menu, no typing required beyond
+answering its yes/no and pick-a-number questions:
 
 1. Install everything (latest Godot, Mono, and offline docs) in one go
 2. Download and install the latest Godot from the internet
@@ -29,90 +29,22 @@ Options 2 and 3 ask whether you want Godot, Godot Mono (for C#
 projects), or both. Option 1 always installs both with no extra
 questions, since it is meant to be the simplest path for a new machine.
 
-Everything below this section is for whoever maintains the scripts
-themselves.
-
 ## Requirements
 
 - Windows
 - PowerShell, run as Administrator. The scripts check for this and stop
   if you are not elevated.
 
-## Scripts
+## Repo layout
 
-### Install-Godot.ps1
-
-Installs Godot from build files you already have on disk. Use this when
-you downloaded a specific version yourself and want to pin that exact
-build.
-
-```
-.\Install-Godot.ps1 -SourcePath "C:\path\to\folder\with\build\files"
-```
-
-Parameters:
-
-- `-SourcePath` folder containing the build(s). Can hold the already
-  extracted exe folder(s) or the original .zip files from
-  godotengine.org or GitHub. See `source` below for the expected
-  layout.
-- `-Variant` Standard, Mono, or Both. Default is Both.
-- `-InstallRoot` where versions get installed. Default is
-  `C:\Program Files\Godot`.
-- `-DocsUrl` the online docs link used for the docs shortcut. Default is
-  `https://docs.godotengine.org/en/stable/`.
-
-If a `docs-html` folder is found inside `-SourcePath` (the rendered
-offline docs, see Get-GodotDocs.ps1 below), it gets copied alongside the
-install and a local docs shortcut is added, pointing straight at
-`index.html`.
-
-### Get-LatestGodot.ps1
-
-Self-contained script that pulls the latest stable release straight from
-the godotengine/godot GitHub repo, checks its SHA512 checksum, and
-installs it the same way as Install-Godot.ps1. If that version is
-already installed, it skips the download and just makes sure the
-shortcuts exist.
-
-```
-.\Get-LatestGodot.ps1
-```
-
-Takes the same `-Variant`, `-InstallRoot`, and `-DocsUrl` parameters as
-above.
-
-### Get-LatestGodot-Force.ps1
-
-Same as Get-LatestGodot.ps1, but it always re-downloads and overwrites
-that version's install, even if it is already there.
-
-```
-.\Get-LatestGodot-Force.ps1
-```
-
-### Get-GodotDocs.ps1
-
-Downloads the official prebuilt offline HTML documentation (rendered
-pages, not the raw .rst source) from the godot-docs project, refreshed
-weekly, and attaches it to an already installed Godot version. Updates
-the `Godot Docs (Local)` Start Menu shortcut to open `index.html`
-directly.
-
-```
-.\Get-GodotDocs.ps1
-```
-
-Parameters:
-
-- `-DocsVersion` stable, latest, or 3.6. Default is stable.
-- `-GodotVersion` which installed version to attach the docs to, for
-  example 4.7. If only one version is installed, this is detected
-  automatically. Required if more than one is installed.
-- `-InstallRoot` same meaning as in the other scripts.
-- `-Destination` instead of attaching to an install, just download and
-  extract the docs to a folder of your choice, for example to fill in
-  `source\docs-html` before running Install-Godot.ps1.
+- `Godot Install Menu.bat`, the only thing meant to be double-clicked.
+  Everything else here is for whoever maintains the scripts themselves.
+- [`scripts/`](scripts/README.md) the menu itself plus the four scripts
+  it wraps. Each one can also be run directly.
+- [`build/`](build/README.md) builds the downloadable
+  `Godot-Installer-Setup.exe` attached to GitHub Releases.
+- [`source/`](source/README.md) an example input layout for
+  `Install-Godot.ps1 -SourcePath`.
 
 ## What gets created
 
@@ -130,34 +62,7 @@ For a given version, for example 4.7:
 Running any of these scripts again for a newer version does not touch an
 older one. Each version lives in its own folder with its own shortcuts.
 
-## source
-
-Shows the folder layout Install-Godot.ps1 expects for `-SourcePath`.
-Drop your real Godot zip or extracted build folder in place of the
-placeholder text files and point `-SourcePath` at the `source` folder
-(or copy the layout anywhere else you like).
-
-## Building the downloadable installer
-
-Everything in `build\` is maintainer-only, not something end users run.
-`Build-SfxInstaller.ps1` packages the menu, the four scripts,
-README.md, and LICENSE into a single self-extracting
-`Godot-Installer-Setup.exe` using `iexpress.exe` (built into Windows, no
-extra tools needed). Double-click `build\Build-SfxInstaller.bat`, or
-from PowerShell:
-
-```
-.\build\Build-SfxInstaller.ps1
-```
-
-Produces `dist\Godot-Installer-Setup.exe` at the repo root. Running
-that file copies its contents to
-`%USERPROFILE%\Downloads\Godot Installer` and opens
-`Godot Install Menu.bat` from there, via the bundled
-`build\_bootstrap.bat`. This is the file that gets attached to GitHub
-Releases.
-
 ## Logs
 
-Each script writes a timestamped log to a `logs` folder created in
-whatever directory you ran it from.
+Each script writes a timestamped log to a `logs` folder at the repo
+root, created the first time anything is run.

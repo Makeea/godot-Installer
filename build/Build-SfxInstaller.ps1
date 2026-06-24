@@ -26,22 +26,25 @@ param(
 	[string]$OutputPath = (Join-Path (Split-Path -Parent $PSScriptRoot) 'dist\Godot-Installer-Setup.exe')
 )
 
-# Repo root, since this script lives in build\ but most of what it
-# bundles lives one level up alongside the end-user-facing files.
+# Repo root, since this script lives in build\ and the files it
+# bundles live in scripts\ and at the repo root itself.
 $repo_root = Split-Path -Parent $PSScriptRoot
+$scripts_dir = Join-Path $repo_root 'scripts'
 
-$filesFromRepoRoot = @(
+$filesFromScriptsFolder = @(
 	'Install-Godot.ps1'
 	'Get-LatestGodot.ps1'
 	'Get-LatestGodot-Force.ps1'
 	'Get-GodotDocs.ps1'
-	'Godot Install Menu.bat'
 	'Godot Install Menu.ps1'
+)
+$filesFromRepoRoot = @(
+	'Godot Install Menu.bat'
 	'README.md'
 	'LICENSE'
 )
 $filesFromBuildFolder = @('_bootstrap.bat')
-$filesToBundle = $filesFromRepoRoot + $filesFromBuildFolder
+$filesToBundle = $filesFromScriptsFolder + $filesFromRepoRoot + $filesFromBuildFolder
 
 $stage_dir	= Join-Path $env:TEMP 'Godot_Sfx_Stage'
 $sed_path	= Join-Path $stage_dir 'GodotInstaller.sed'
@@ -49,22 +52,19 @@ $sed_path	= Join-Path $stage_dir 'GodotInstaller.sed'
 if (Test-Path -LiteralPath $stage_dir) { Remove-Item -LiteralPath $stage_dir -Recurse -Force }
 New-Item -ItemType Directory -Path $stage_dir -Force | Out-Null
 
-foreach ($file in $filesFromRepoRoot) {
-	$source = Join-Path $repo_root $file
+function Copy-BundleFile {
+	param([string]$BaseDir, [string]$File)
+	$source = Join-Path $BaseDir $File
 	if (-not (Test-Path -LiteralPath $source)) {
 		Write-Error "Missing file, can't build: $source"
 		exit 1
 	}
-	Copy-Item -LiteralPath $source -Destination (Join-Path $stage_dir $file) -Force
+	Copy-Item -LiteralPath $source -Destination (Join-Path $stage_dir $File) -Force
 }
-foreach ($file in $filesFromBuildFolder) {
-	$source = Join-Path $PSScriptRoot $file
-	if (-not (Test-Path -LiteralPath $source)) {
-		Write-Error "Missing file, can't build: $source"
-		exit 1
-	}
-	Copy-Item -LiteralPath $source -Destination (Join-Path $stage_dir $file) -Force
-}
+
+foreach ($file in $filesFromScriptsFolder) { Copy-BundleFile -BaseDir $scripts_dir -File $file }
+foreach ($file in $filesFromRepoRoot) { Copy-BundleFile -BaseDir $repo_root -File $file }
+foreach ($file in $filesFromBuildFolder) { Copy-BundleFile -BaseDir $PSScriptRoot -File $file }
 
 $outputDir = Split-Path -Parent $OutputPath
 if (-not (Test-Path -LiteralPath $outputDir)) { New-Item -ItemType Directory -Path $outputDir -Force | Out-Null }
