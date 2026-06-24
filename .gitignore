@@ -1,4 +1,5 @@
 logs/
+dist/
 source/**/*.zip
 source/**/*.exe
 source/docs-html/*

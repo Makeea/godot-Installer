@@ -8,9 +8,15 @@ and the docs are easy to find.
 
 ## For everyone else (no PowerShell needed)
 
-Double-click `Godot Install Menu.bat`. It asks for Administrator once,
-then shows a plain numbered menu, no typing required beyond answering
-its yes/no and pick-a-number questions:
+Download `Godot-Installer-Setup.exe` from the
+[Releases](../../releases) page and run it. It copies itself to
+`Downloads\Godot Installer` and opens the menu below automatically, no
+need to clone this repo or know what any of these files are.
+
+If you already have this repo instead, double-click
+`Godot Install Menu.bat` directly. It asks for Administrator once, then
+shows a plain numbered menu, no typing required beyond answering its
+yes/no and pick-a-number questions:
 
 1. Install everything (latest Godot, Mono, and offline docs) in one go
 2. Download and install the latest Godot from the internet
@@ -130,6 +136,22 @@ Shows the folder layout Install-Godot.ps1 expects for `-SourcePath`.
 Drop your real Godot zip or extracted build folder in place of the
 placeholder text files and point `-SourcePath` at the `source` folder
 (or copy the layout anywhere else you like).
+
+## Building the downloadable installer
+
+`Build-SfxInstaller.ps1` is maintainer-only, not something end users
+run. It packages the menu, the four scripts, README.md, and LICENSE
+into a single self-extracting `Godot-Installer-Setup.exe` using
+`iexpress.exe` (built into Windows, no extra tools needed):
+
+```
+.\Build-SfxInstaller.ps1
+```
+
+Produces `dist\Godot-Installer-Setup.exe`. Running that file copies its
+contents to `%USERPROFILE%\Downloads\Godot Installer` and opens
+`Godot Install Menu.bat` from there, via the bundled `_bootstrap.bat`.
+This is the file that gets attached to GitHub Releases.
 
 ## Logs
 
