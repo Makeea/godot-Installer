@@ -60,6 +60,11 @@ if (Test-Path -LiteralPath $OutputPath) { Remove-Item -LiteralPath $OutputPath -
 $fileLines = for ($i = 0; $i -lt $filesToBundle.Count; $i++) { "FILE$i=`"$($filesToBundle[$i])`"" }
 $sourceFileRefs = for ($i = 0; $i -lt $filesToBundle.Count; $i++) { "%FILE$i%=" }
 
+# AppLaunched runs through cmd.exe rather than naming _bootstrap.bat
+# directly. iexpress tries to spawn a bare .bat AppLaunched via
+# command.com, which does not exist on 64-bit Windows, and fails with
+# "Error creating process command.com ... cannot find the file
+# specified." Routing it through cmd.exe avoids that entirely.
 $sed = @"
 [Version]
 Class=IEXPRESS
@@ -89,7 +94,7 @@ DisplayLicense=
 FinishMessage=
 TargetName=$OutputPath
 FriendlyName=Godot Installer
-AppLaunched=_bootstrap.bat
+AppLaunched=cmd /c _bootstrap.bat
 PostInstallCmd=<None>
 AdminQuietInstCmd=
 UserQuietInstCmd=
