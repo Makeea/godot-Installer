@@ -1,5 +1,5 @@
 logs/
-sample-source/**/*.zip
-sample-source/**/*.exe
-sample-source/docs-html/*
-!sample-source/docs-html/OPTIONAL_LOCAL_DOCS_HERE.txt
+source/**/*.zip
+source/**/*.exe
+source/docs-html/*
+!source/docs-html/OPTIONAL_LOCAL_DOCS_HERE.txt

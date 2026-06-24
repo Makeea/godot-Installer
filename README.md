@@ -48,7 +48,7 @@ Parameters:
 
 - `-SourcePath` folder containing the build(s). Can hold the already
   extracted exe folder(s) or the original .zip files from
-  godotengine.org or GitHub. See `sample-source` below for the expected
+  godotengine.org or GitHub. See `source` below for the expected
   layout.
 - `-Variant` Standard, Mono, or Both. Default is Both.
 - `-InstallRoot` where versions get installed. Default is
@@ -106,7 +106,7 @@ Parameters:
 - `-InstallRoot` same meaning as in the other scripts.
 - `-Destination` instead of attaching to an install, just download and
   extract the docs to a folder of your choice, for example to fill in
-  `sample-source\docs-html` before running Install-Godot.ps1.
+  `source\docs-html` before running Install-Godot.ps1.
 
 ## What gets created
 
@@ -124,12 +124,12 @@ For a given version, for example 4.7:
 Running any of these scripts again for a newer version does not touch an
 older one. Each version lives in its own folder with its own shortcuts.
 
-## sample-source
+## source
 
 Shows the folder layout Install-Godot.ps1 expects for `-SourcePath`.
 Drop your real Godot zip or extracted build folder in place of the
-placeholder text files and point `-SourcePath` at the `sample-source`
-folder (or copy the layout anywhere else you like).
+placeholder text files and point `-SourcePath` at the `source` folder
+(or copy the layout anywhere else you like).
 
 ## Logs
 

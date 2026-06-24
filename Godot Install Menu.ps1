@@ -138,8 +138,8 @@ function Invoke-ChildScript {
 }
 
 function Invoke-InstallFromFolder {
-	$sampleSource = Join-Path $PSScriptRoot 'sample-source'
-	$initialPath = if (Test-Path -LiteralPath $sampleSource) { $sampleSource } else { $PSScriptRoot }
+	$sourceFolder = Join-Path $PSScriptRoot 'source'
+	$initialPath = if (Test-Path -LiteralPath $sourceFolder) { $sourceFolder } else { $PSScriptRoot }
 	$chosenFolder = Select-FolderDialog -Description "Select the folder containing the Godot build you want to install (the extracted folder or .zip files)" -InitialPath $initialPath
 	if (-not $chosenFolder) {
 		Write-Host "Cancelled, nothing was installed."
